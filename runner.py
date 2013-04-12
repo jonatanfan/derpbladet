@@ -1,6 +1,5 @@
 from flask import Flask, request
 import requests
-import ipdb
 import BeautifulSoup
 import re
 from urlparse import urlparse
