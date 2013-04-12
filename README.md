@@ -1,4 +1,4 @@
 derpbladet
 ==========
 
-application running on https://github.com/jonatanfan/derpbladet
+application running on http://derpbladet.herokuapp.com/
