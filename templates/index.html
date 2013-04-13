@@ -1,0 +1,47 @@
+<!doctype html>
+<head>
+	<meta charset="utf-8">
+	<title>Derpbladet - derpify your internets</title>
+	<meta name="description" content="Derpbladet is a python micro-micro-framework for taking a local copy of a website and translate it to derps">
+	<meta name="author" content="Jonatan Nilsson">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+    <header>
+        <h1>Derpbladet</h1>
+        <nav>
+            <a href="#about">About</a>
+            <a href="#demo">Demo</a>
+        </nav>
+    </header>
+    
+    <section>
+        <a id="about">
+            <h1>About</h1>
+            <p>
+                Derpbladet is a python micro-micro-framework for taking a local copy of a website and translate it to derps.
+                The aggressive derpifying of the html document will often lead to target sites losing structural layout.
+            </p>
+            <p>
+                Download is available at <a href="https://github.com/jonatanfan/derpbladet">https://github.com/jonatanfan/derpbladet</a>. Demo application is running on Flask
+            </p>
+            <p>Todo: some kind of caching for translated pages, stylesheet for this index page</p>
+        </a>
+    </section>
+    
+    <section>
+    <a id="demo">
+        <h1>Demo</h1>
+    </a>
+    {% for site in allowed_sites %}
+    <article>
+        <a href="/{{ site }}/">{{ site }}</a>
+    </article>
+    {% endfor %}
+    </section>
+    
+    <section>
+        <a href="https://github.com/jonatanfan"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+    </section>
+</body>
+</html>

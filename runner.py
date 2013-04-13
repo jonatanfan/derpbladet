@@ -1,39 +1,53 @@
-from flask import Flask, request
+# -*- coding: utf-8 -*-
+from flask import Flask, request, redirect, abort, render_template
 import requests
-import BeautifulSoup
-import re
-from urlparse import urlparse
+import ipdb
+from functools import wraps
+from derp import DerpPage
+
 
 app = Flask(__name__)
+allowed_sites = ("expressen.se",
+                 "aftonbladet.se",
+                 "svd.se",
+                 "wsj.com",)
 
-def translate(content):
-    soup = BeautifulSoup.BeautifulSoup(content)
+
+class MyDerpPage(DerpPage):
+    def derpify(self, ):
+        self.derp_expression = u"[A-Za-zåäöÅÄÖé]+"
+        DerpPage.derpify(self) # TODO: something using super instead or whatever
+
+
+def page_cache(f):
+    @wraps(f)
+    def inner(*args, **kwargs):
+        return f(*args, **kwargs)
+    return inner
+
+
+def site_allowed(site):
+    if site in allowed_sites:
+        return True
+    else:
+        return False
+
     
-    for tag in ("h1", "h2", "h3", "p", "a", "strong", "span", "div", "em", "i", "option", "time", "title"):
-        for paragraph in soup.findAll(tag):
-            for i in range(len(paragraph.contents)):
-                if type(paragraph.contents[i]) == BeautifulSoup.NavigableString:
-                    paragraph.contents[i] = BeautifulSoup.NavigableString(re.sub("[A-Za-z\xe5\xe4\xf6\xc5\xc4\xd6\;]+", "DERP", paragraph.contents[i]))         
+@app.route('/<site>/', defaults={'path': ''})
+@app.route('/<site>/<path:path>')
+@page_cache
+def page(site, path):
+    if site_allowed(site):
+        r = requests.get('http://%s/%s' % (site, path))
+        page = MyDerpPage(site, r.content)
+        return page.translate()
+    else:
+        return abort(404)
+
+@app.route('/')
+def index():
+    return render_template("index.html", allowed_sites=allowed_sites)
     
-    for link in soup.findAll("link"):
-        if link["href"][0] == "/":
-            link["href"] = "http://www.aftonbladet.se%s" % link["href"]
-            
-    for a in soup.findAll("a"):
-        href=filter(lambda t: t[0]=="href", a.attrs)[0]
-        url = urlparse(href[1])
-        if url.hostname == "www.aftonbladet.se":
-            a.attrs.remove(href)
-            a.attrs.append(("href", "%s%s" % (request.host_url, url.path[1:])))               
-    return soup.prettify()
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def page(path):
-    r = requests.get('http://www.aftonbladet.se/%s' % path)
-    return translate(r.content)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
