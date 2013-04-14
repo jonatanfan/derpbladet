@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, redirect, abort, render_template, g
+from flask import Flask, request, redirect, abort, render_template, g, Response
 import requests
 import ipdb
 from functools import wraps
@@ -88,6 +88,17 @@ def page(site, path):
 @app.route('/')
 def index():
     return render_template("index.html", allowed_sites=allowed_sites)
+
+@app.route('/robots.txt')
+def robots():
+    robot = "User-agent: *\n"
+    for s in allowed_sites:
+        robot += "Disallow: /%s/\n" % s
+    return Response(robot, mimetype='text/txt')
+
+    
+
+
     
 
 if __name__ == '__main__':
