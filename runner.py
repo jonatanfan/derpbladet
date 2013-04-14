@@ -8,6 +8,7 @@ import pickle
 import psycopg2
 import os
 import datetime
+import urlparse
 
 
 app = Flask(__name__)
@@ -25,9 +26,14 @@ class MyDerpPage(DerpPage):
 
 @app.before_request
 def before_request():
-    conn_string = os.environ['DATABASE_URL']
-    g.conn = psycopg2.connect(conn_string)
-
+    result = urlparse.urlparse(os.environ['DATABASE_URL'])
+    g.conn = psycopg2.connect(
+        database = result.path[1:],
+        user = result.username,
+        password = result.password,
+        host = result.hostname,
+        port = result.port,
+    )
 
 @app.teardown_request
 def teardown_request(exception):
