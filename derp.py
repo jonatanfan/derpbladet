@@ -9,6 +9,7 @@ class DerpPage(BeautifulSoup.BeautifulSoup):
         self.site = site
         self.site_url = "http://%s" % self.site
         self.derp_tags = ("h1", "h2", "h3", "p", "a", "strong", "span", "div", "em", "i", "option", "time", "title")
+        self.derp_content_tags = (("meta", "keywords"), ("meta", "description"))
         self.derp_expression = u"[A-Za-z]+"
         self.derp_word = "DERP"
     
@@ -24,6 +25,15 @@ class DerpPage(BeautifulSoup.BeautifulSoup):
                 for i in range(len(element.contents)):
                     if type(element.contents[i]) == BeautifulSoup.NavigableString:
                         element.contents[i] = BeautifulSoup.NavigableString(re.sub(self.derp_expression, self.derp_word, element.contents[i]))
+                        
+        for tag, attr in self.derp_content_tags:
+            for element in self.findAll(tag):
+                if ('name', attr) in element.attrs:
+                    contents = filter(lambda t: t[0]=="content", element.attrs)
+                    for content in contents:
+                        element.attrs.remove(content)
+                        element.attrs.append(("content", re.sub(self.derp_expression, self.derp_word, content[1])))
+                    
     
     def translate_relatives(self):
         """
