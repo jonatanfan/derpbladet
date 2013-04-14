@@ -55,7 +55,6 @@ def page_cache(f):
         if cursor.rowcount > 0:
             row = cursor.fetchone()
             if row[1]+datetime.timedelta(seconds=60)>now:
-                print("using cache")
                 return row[0]
             else:
                 cursor.execute("DELETE FROM cacher WHERE site=%s AND page=%s", (site, path,))
